@@ -5,7 +5,9 @@
     "database": "khanhduy",
     "host": "127.0.0.1",
     "dialect": "mysql",
-    "loggin": false
+    "loggin": false,
+   
+    "timezon":"+07:00"
   },
   "test": {
     "username": "root",
