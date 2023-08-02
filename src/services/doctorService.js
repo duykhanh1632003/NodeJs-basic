@@ -107,7 +107,6 @@ let saveDetailInforDoctors = (inputData) => {
           raw: false
         })
 
-        console.log("check input data",inputData)
         if(doctorInfor){
           //update
           doctorInfor.doctorId = inputData.doctorId
@@ -167,6 +166,17 @@ let getDetailDoctorById = async (id) => {
             model: db.Allcode,
             as: "positionData",
             attributes: ["valueEn", "valueVi"],
+          },
+          {
+            model: db.Doctor_Infor,
+            attributes: {
+              exclude: ["id", "doctorId"],
+            },
+            include:[
+              {model: db.Allcode,as: "priceTypeData",attributes: ["valueEn", "valueVi"],},
+              {model: db.Allcode,as: "provinceTypeData",attributes: ["valueEn", "valueVi"],},
+              {model: db.Allcode,as: "paymentTypeData",attributes: ["valueEn", "valueVi"],}
+            ]
           },
         ],
       
@@ -269,6 +279,7 @@ let getScheduleByDate = (doctorId, date) =>{
               as: "timeTypeData",
               attributes: ["valueEn", "valueVi"],
             },
+            
           ],
         
   
@@ -291,11 +302,49 @@ let getScheduleByDate = (doctorId, date) =>{
   })
 }
 
+let getExtraInforDoctorById  =(doctorId) =>{
+  return new Promise( async (resolve ,reject) =>{
+    try{
+      if(!doctorId){
+        resolve({
+          errCode:1,
+          errMessage: "Missing required parameter"
+        })
+      }
+      else{
+        let data = await db.Doctor_Infor.findOne({
+          where: {doctorId : doctorId},
+          attributes:{
+            exclude : ['id' , 'doctorId']
+          },
+          include:[
+            {model: db.Allcode,as: "priceTypeData",attributes: ["valueEn", "valueVi"],},
+            {model: db.Allcode,as: "provinceTypeData",attributes: ["valueEn", "valueVi"],},
+            {model: db.Allcode,as: "paymentTypeData",attributes: ["valueEn", "valueVi"],}
+          ],
+          raw: false,
+          nest: true
+        })
+        resolve({
+          errCode: 0,
+          data : data
+        })
+      }
+    }
+    catch(e){
+      reject(e)
+    }
+  })
+}
+
+
+
 module.exports = {
   getTopDoctorHome: getTopDoctorHome,
   getAllDoctors: getAllDoctors,
   saveDetailInforDoctors: saveDetailInforDoctors,
   getDetailDoctorById: getDetailDoctorById,
   bulkCreateDoctor: bulkCreateDoctor,
-  getScheduleByDate: getScheduleByDate
+  getScheduleByDate: getScheduleByDate,
+  getExtraInforDoctorById: getExtraInforDoctorById
 };
